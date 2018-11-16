@@ -5,6 +5,9 @@ mnist_svm
 A classifier program for recognizing handwritten digits from the MNIST
 data set, using an SVM classifier."""
 
+import os
+os.chdir("./src")
+
 #### Libraries
 # My libraries
 import mnist_loader 
