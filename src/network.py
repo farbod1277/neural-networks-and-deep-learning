@@ -31,9 +31,8 @@ class Network(object):
         ever used in computing the outputs from later layers."""
         self.num_layers = len(sizes)
         self.sizes = sizes
-        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x)
-                        for x, y in zip(sizes[:-1], sizes[1:])]
+        self.biases = np.array([[0]])
+        self.weights = np.array([[0]])
 
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
@@ -51,10 +50,10 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
+        out = [self.feedforward(1)[0]]
         if test_data: n_test = len(test_data)
         n = len(training_data)
         for j in xrange(epochs):
-            random.shuffle(training_data)
             mini_batches = [
                 training_data[k:k+mini_batch_size]
                 for k in xrange(0, n, mini_batch_size)]
@@ -64,7 +63,8 @@ class Network(object):
                 print "Epoch {0}: {1} / {2}".format(
                     j, self.evaluate(test_data), n_test)
             else:
-                print "Epoch {0} complete".format(j)
+                out.append(self.feedforward(1)[0])
+        return out
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -102,7 +102,7 @@ class Network(object):
         delta = self.cost_derivative(activations[-1], y) * \
             sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        nabla_w[-1] = np.dot(delta, activations[-2])
         # Note that the variable l in the loop below is used a little
         # differently to the notation in Chapter 2 of the book.  Here,
         # l = 1 means the last layer of neurons, l = 2 is the
